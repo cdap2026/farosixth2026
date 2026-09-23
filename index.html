@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Creador de Especies 3D | Ciencias Naturales</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2C3E50;
+            --light: #F7FFF7;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        /* Barra de progreso */
+        .progress-wrapper {
+            background: #eee;
+            border-radius: 20px;
+            height: 25px;
+            width: 100%;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--secondary), #45b7d1);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease-out;
+            border-radius: 20px;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Preguntas y Botones */
+        .question-box {
+            min-height: 250px;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .options-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            background: white;
+            border: 4px solid var(--secondary);
+            border-radius: 20px;
+            padding: 20px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.05) translateY(-5px);
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .option-emoji {
+            font-size: 3rem;
+        }
+
+        /* Resultados */
+        .result-container {
+            display: none;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .scientific-name {
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-style: italic;
+            font-weight: 900;
+            margin: 15px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 15px;
+            border: 2px dashed var(--primary);
+        }
+
+        .image-3d-placeholder {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            background: linear-gradient(45deg, #e0eafc, #cfdef3);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+            border: 5px solid white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-3d-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .taxonomic-path {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            border-left: 5px solid var(--accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>🧬 Descubridor de Especies 3D</h1>
+        <p class="subtitle">¡Sigue la clave dicotómica para descubrir tu criatura!</p>
+
+        <div id="game-ui">
+            <div class="progress-wrapper">
+                <div class="progress-bar" id="progress"></div>
+                <div class="progress-text" id="progress-text">0 / 20</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-text" id="question">Cargando pregunta...</div>
+                <div class="options-container">
+                    <button class="option-btn" onclick="selectOption('A')">
+                        <span class="option-emoji" id="emoji-A">❓</span>
+                        <span id="text-A">Opción A</span>
+                    </button>
+                    <button class="option-btn" onclick="selectOption('B')">
+                        <span class="option-emoji" id="emoji-B">❓</span>
+                        <span id="text-B">Opción B</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-container" id="result-ui">
+            <h2>🎉 ¡Especie Descubierta! <span id="final-emoji">👾</span></h2>
+            
+            <!-- Aquí irán tus imágenes premium 3D -->
+            <div class="image-3d-placeholder">
+                <img id="species-image" src="https://via.placeholder.com/300x300.png?text=Imagen+3D+Premium+Aqui" alt="Especie 3D">
+            </div>
+
+            <p>Nombre Científico:</p>
+            <div class="scientific-name" id="sci-name">Genus species</div>
+            
+            <h3>📍 Ruta Taxonómica Recorrida:</h3>
+            <div class="taxonomic-path" id="path-list">
+                <!-- Se llena con JS -->
+            </div>
+            
+            <button class="option-btn" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem;" onclick="location.reload()">🔄 Investigar nueva especie</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de 20 preguntas dicotómicas
+        const questions = [
+            { q: "¿En qué hábitat se desenvuelve principalmente?", a: { text: "Acuático", emoji: "🌊", lat: "Aqua", trait: "Vive en el agua" }, b: { text: "Terrestre", emoji: "🌍", lat: "Terra", trait: "Vive en la tierra" } },
+            { q: "¿Posee columna vertebral?", a: { text: "Sí (Vertebrado)", emoji: "🦴", lat: "chordata", trait: "Es vertebrado" }, b: { text: "No (Invertebrado)", emoji: "🐛", lat: "invertebrata", trait: "Es invertebrado" } },
+            { q: "¿Cómo es su temperatura corporal?", a: { text: "Sangre Caliente", emoji: "🌡️", lat: "thermo", trait: "Endotérmico" }, b: { text: "Sangre Fría", emoji: "🦎", lat: "gelidus", trait: "Ectotérmico" } },
+            { q: "¿Qué recubre su cuerpo?", a: { text: "Escamas o Placas", emoji: "🐊", lat: "squamata", trait: "Cubierto de escamas" }, b: { text: "Pelaje o Plumas", emoji: "🐻", lat: "pilosus", trait: "Cubierto de pelo/plumas" } },
+            { q: "¿Cómo respira?", a: { text: "Pulmones", emoji: "🫁", lat: "pulmo", trait: "Respiración pulmonar" }, b: { text: "Branquias/Piel", emoji: "🐟", lat: "branchia", trait: "Respiración branquial o cutánea" } },
+            { q: "¿Cómo se reproduce?", a: { text: "Huevos (Ovíparo)", emoji: "🥚", lat: "ovi", trait: "Pone huevos" }, b: { text: "Crías vivas (Vivíparo)", emoji: "🍼", lat: "vivi", trait: "Da a luz crías vivas" } },
+            { q: "¿Cuál es su dieta base?", a: { text: "Carne (Carnívoro)", emoji: "🥩", lat: "carni", trait: "Se alimenta de carne" }, b: { text: "Plantas (Herbívoro)", emoji: "🌿", lat: "herba", trait: "Se alimenta de plantas" } },
+            { q: "¿Cómo se desplaza?", a: { text: "Camina / Corre", emoji: "🐾", lat: "gressus", trait: "Camina o corre" }, b: { text: "Vuela / Nada", emoji: "🦅", lat: "volans", trait: "Vuela o nada" } },
+            { q: "¿Cuál es su ritmo de actividad?", a: { text: "Diurno", emoji: "☀️", lat: "dies", trait: "Activo de día" }, b: { text: "Nocturno", emoji: "🌙", lat: "nox", trait: "Activo de noche" } },
+            { q: "¿Cuál es su tamaño relativo?", a: { text: "Gigante", emoji: "🐘", lat: "magnus", trait: "Tamaño colosal" }, b: { text: "Pequeño", emoji: "🐁", lat: "parvus", trait: "Tamaño diminuto" } },
+            { q: "¿Cómo es su estructura social?", a: { text: "En Manada", emoji: "🐺", lat: "grex", trait: "Vive en grupos" }, b: { text: "Solitario", emoji: "🐆", lat: "solus", trait: "Es solitario" } },
+            { q: "¿Mecanismo de defensa principal?", a: { text: "Veneno / Toxinas", emoji: "🧪", lat: "tox", trait: "Produce veneno" }, b: { text: "Armadura / Cuernos", emoji: "🦏", lat: "cornu", trait: "Posee armadura o cuernos" } },
+            { q: "¿Cómo es su visión?", a: { text: "Ojos grandes", emoji: "👀", lat: "oculus", trait: "Visión aguda" }, b: { text: "Casi ciego", emoji: "🦇", lat: "caecus", trait: "Se guía por otros sentidos" } },
+            { q: "¿Qué tipo de sonido emite?", a: { text: "Rugido / Grito", emoji: "🦁", lat: "rugiens", trait: "Emite rugidos fuertes" }, b: { text: "Silencioso / Canto", emoji: "🦉", lat: "silens", trait: "Es silencioso o emite cantos" } },
+            { q: "¿Tiene cola visible?", a: { text: "Cola Larga", emoji: "🐒", lat: "longa", trait: "Posee cola prensil o larga" }, b: { text: "Sin cola", emoji: "🐸", lat: "brevis", trait: "Carece de cola" } },
+            { q: "¿Cómo son sus extremidades?", a: { text: "Garras afiladas", emoji: "🦅", lat: "acuti", trait: "Garras desarrolladas" }, b: { text: "Pezuñas o ventosas", emoji: "🦓", lat: "ungula", trait: "Extremidades adaptadas al terreno" } },
+            { q: "¿En qué clima prospera?", a: { text: "Frío extremo", emoji: "❄️", lat: "polaris", trait: "Adaptado al hielo" }, b: { text: "Calor / Trópico", emoji: "🌴", lat: "tropicus", trait: "Adaptado al calor" } },
+            { q: "¿Dónde descansa o se refugia?", a: { text: "Cuevas / Madrigueras", emoji: "🕳️", lat: "antrum", trait: "Duerme en cavernas" }, b: { text: "Árboles / Nidos", emoji: "🌳", lat: "arbor", trait: "Construye nidos en altura" } },
+            { q: "¿Qué tan rápido es?", a: { text: "Muy rápido", emoji: "⚡", lat: "velox", trait: "Alcanza altas velocidades" }, b: { text: "Lento y cauteloso", emoji: "🐢", lat: "tardus", trait: "Movimientos calculados" } },
+            { q: "¿Característica especial (Fantasía)?", a: { text: "Bioluminiscente", emoji: "✨", lat: "lux", trait: "Brilla en la oscuridad" }, b: { text: "Camuflaje perfecto", emoji: "🍃", lat: "occultus", trait: "Se vuelve casi invisible" } }
+        ];
+
+        let currentQ = 0;
+        let userPath = [];
+        let latinParts = [];
+        let finalEmoji = "";
+
+        function loadQuestion() {
+            if (currentQ >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const qData = questions[currentQ];
+            document.getElementById('question').innerText = `${currentQ + 1}. ${qData.q}`;
+            
+            document.getElementById('text-A').innerText = qData.a.text;
+            document.getElementById('emoji-A').innerText = qData.a.emoji;
+            
+            document.getElementById('text-B').innerText = qData.b.text;
+            document.getElementById('emoji-B').innerText = qData.b.emoji;
+
+            // Update Progress
+            const progressPct = ((currentQ) / questions.length) * 100;
+            document.getElementById('progress').style.width = progressPct + '%';
+            document.getElementById('progress-text').innerText = `${currentQ} / 20`;
+        }
+
+        function selectOption(choice) {
+            const qData = questions[currentQ];
+            const selected = choice === 'A' ? qData.a : qData.b;
+
+            // Guardar datos
+            userPath.push(`✅ ${selected.trait}`);
+            latinParts.push(selected.lat);
+            finalEmoji = selected.emoji; // El último emoji representará la criatura
+
+            currentQ++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+
+            // Crear nomenclatura binomial (Nomenclatura linneana)
+            // Género: Combinamos el rasgo 1 y 4 (Mayúscula inicial)
+            let genus = latinParts[0].charAt(0).toUpperCase() + latinParts[0].slice(1) + latinParts[3];
+            // Especie: Combinamos el rasgo 6 y 19 (Todo minúscula)
+            let species = latinParts[6] + latinParts[18];
+            
+            document.getElementById('sci-name').innerText = `${genus} ${species}`;
+            document.getElementById('final-emoji').innerText = finalEmoji;
+
+            // Llenar ruta taxonómica
+            let pathHTML = "<ul>";
+            userPath.forEach((step, index) => {
+                pathHTML += `<li><strong>Paso ${index + 1}:</strong> ${step}</li>`;
+            });
+            pathHTML += "</ul>";
+            document.getElementById('path-list').innerHTML = pathHTML;
+
+            createConfetti();
+        }
+
+        function createConfetti() {
+            for(let i=0; i<50; i++) {
+                let conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                conf.style.backgroundColor = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C'][Math.floor(Math.random()*4)];
+                document.body.appendChild(conf);
+            }
+        }
+
+        // Iniciar el juego
+        loadQuestion();
+    </script>
+</body>
+</html>
