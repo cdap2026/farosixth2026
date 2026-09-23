@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧬 Creador de Especies 3D | Ciencias Naturales</title>
+    <title>🧬 Creador de Especies | Ciencias Naturales</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
 
@@ -60,7 +60,6 @@
             width: 100%;
             margin-bottom: 30px;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            overflow: hidden;
             position: relative;
         }
 
@@ -149,34 +148,35 @@
         }
 
         /* Contenedor de la Imagen Generada */
-        .image-3d-placeholder {
-            width: 350px;
-            height: 350px;
+        .image-placeholder {
+            width: 300px;
+            height: 300px;
             margin: 20px auto;
-            background: var(--dark);
-            border-radius: 20px;
+            background: radial-gradient(circle, #ffffff 0%, #e0eafc 100%);
+            border-radius: 50%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             border: 6px solid var(--secondary);
             position: relative;
             overflow: hidden;
         }
 
-        .image-3d-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .image-placeholder img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
             display: none; /* Se oculta hasta que cargue */
-            animation: fadeIn 1.5s ease-in;
+            animation: fadeIn 0.5s ease-in;
+            z-index: 2;
         }
 
         .loading-text {
             color: var(--secondary);
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-top: 15px;
             animation: pulse 1.5s infinite;
         }
@@ -225,6 +225,7 @@
             height: 10px;
             background-color: var(--accent);
             animation: fall linear forwards;
+            z-index: 10;
         }
 
         @keyframes fall {
@@ -235,7 +236,7 @@
 <body>
 
     <div class="game-container">
-        <h1>🧬 Descubridor de Especies 3D</h1>
+        <h1>🧬 Descubridor de Especies</h1>
         <p class="subtitle">¡Sigue la clave dicotómica para descubrir tu criatura!</p>
 
         <div id="game-ui">
@@ -262,12 +263,12 @@
         <div class="result-container" id="result-ui">
             <h2>🎉 ¡Especie Descubierta! <span id="final-emoji">👾</span></h2>
             
-            <div class="image-3d-placeholder">
+            <div class="image-placeholder">
                 <div id="loader-container">
                     <div class="loader"></div>
-                    <div class="loading-text">Renderizando especie en 3D...<br><small>Decodificando ADN</small></div>
+                    <div class="loading-text">Buscando espécimen...</div>
                 </div>
-                <img id="species-image" src="" alt="Especie 3D Premium">
+                <img id="species-image" src="" alt="Imagen de la Especie">
             </div>
 
             <p>Nombre Científico:</p>
@@ -283,34 +284,32 @@
     </div>
 
     <script>
-        // Hemos añadido la propiedad 'visual' para recolectar cómo se verá el animal en el render 3D
         const questions = [
-            { q: "¿En qué hábitat se desenvuelve principalmente?", a: { text: "Acuático", emoji: "🌊", lat: "Aqua", trait: "Vive en el agua", visual: "underwater coral reef environment" }, b: { text: "Terrestre", emoji: "🌍", lat: "Terra", trait: "Vive en la tierra", visual: "magical forest environment" } },
-            { q: "¿Posee columna vertebral?", a: { text: "Sí (Vertebrado)", emoji: "🦴", lat: "chordata", trait: "Es vertebrado", visual: "vertebrate animal" }, b: { text: "No (Invertebrado)", emoji: "🐛", lat: "invertebrata", trait: "Es invertebrado", visual: "bug insect-like alien" } },
+            { q: "¿En qué hábitat se desenvuelve principalmente?", a: { text: "Acuático", emoji: "🌊", lat: "Aqua", trait: "Vive en el agua" }, b: { text: "Terrestre", emoji: "🌍", lat: "Terra", trait: "Vive en la tierra" } },
+            { q: "¿Posee columna vertebral?", a: { text: "Sí (Vertebrado)", emoji: "🦴", lat: "chordata", trait: "Es vertebrado" }, b: { text: "No (Invertebrado)", emoji: "🐛", lat: "invertebrata", trait: "Es invertebrado" } },
             { q: "¿Cómo es su temperatura corporal?", a: { text: "Sangre Caliente", emoji: "🌡️", lat: "thermo", trait: "Endotérmico" }, b: { text: "Sangre Fría", emoji: "🦎", lat: "gelidus", trait: "Ectotérmico" } },
-            { q: "¿Qué recubre su cuerpo?", a: { text: "Escamas o Placas", emoji: "🐊", lat: "squamata", trait: "Cubierto de escamas", visual: "detailed reptilian scales" }, b: { text: "Pelaje o Plumas", emoji: "🐻", lat: "pilosus", trait: "Cubierto de pelo/plumas", visual: "soft fluffy fur" } },
+            { q: "¿Qué recubre su cuerpo?", a: { text: "Escamas o Placas", emoji: "🐊", lat: "squamata", trait: "Cubierto de escamas" }, b: { text: "Pelaje o Plumas", emoji: "🐻", lat: "pilosus", trait: "Cubierto de pelo/plumas" } },
             { q: "¿Cómo respira?", a: { text: "Pulmones", emoji: "🫁", lat: "pulmo", trait: "Respiración pulmonar" }, b: { text: "Branquias/Piel", emoji: "🐟", lat: "branchia", trait: "Respiración branquial o cutánea" } },
             { q: "¿Cómo se reproduce?", a: { text: "Huevos (Ovíparo)", emoji: "🥚", lat: "ovi", trait: "Pone huevos" }, b: { text: "Crías vivas (Vivíparo)", emoji: "🍼", lat: "vivi", trait: "Da a luz crías vivas" } },
-            { q: "¿Cuál es su dieta base?", a: { text: "Carne (Carnívoro)", emoji: "🥩", lat: "carni", trait: "Se alimenta de carne", visual: "sharp teeth" }, b: { text: "Plantas (Herbívoro)", emoji: "🌿", lat: "herba", trait: "Se alimenta de plantas", visual: "friendly vegetarian" } },
-            { q: "¿Cómo se desplaza?", a: { text: "Camina / Corre", emoji: "🐾", lat: "gressus", trait: "Camina o corre", visual: "strong legs" }, b: { text: "Vuela / Nada", emoji: "🦅", lat: "volans", trait: "Vuela o nada", visual: "majestic wings or fins" } },
-            { q: "¿Cuál es su ritmo de actividad?", a: { text: "Diurno", emoji: "☀️", lat: "dies", trait: "Activo de día" }, b: { text: "Nocturno", emoji: "🌙", lat: "nox", trait: "Activo de noche", visual: "glowing moonlit" } },
-            { q: "¿Cuál es su tamaño relativo?", a: { text: "Gigante", emoji: "🐘", lat: "magnus", trait: "Tamaño colosal", visual: "giant huge creature" }, b: { text: "Pequeño", emoji: "🐁", lat: "parvus", trait: "Tamaño diminuto", visual: "tiny cute creature" } },
+            { q: "¿Cuál es su dieta base?", a: { text: "Carne (Carnívoro)", emoji: "🥩", lat: "carni", trait: "Se alimenta de carne" }, b: { text: "Plantas (Herbívoro)", emoji: "🌿", lat: "herba", trait: "Se alimenta de plantas" } },
+            { q: "¿Cómo se desplaza?", a: { text: "Camina / Corre", emoji: "🐾", lat: "gressus", trait: "Camina o corre" }, b: { text: "Vuela / Nada", emoji: "🦅", lat: "volans", trait: "Vuela o nada" } },
+            { q: "¿Cuál es su ritmo de actividad?", a: { text: "Diurno", emoji: "☀️", lat: "dies", trait: "Activo de día" }, b: { text: "Nocturno", emoji: "🌙", lat: "nox", trait: "Activo de noche" } },
+            { q: "¿Cuál es su tamaño relativo?", a: { text: "Gigante", emoji: "🐘", lat: "magnus", trait: "Tamaño colosal" }, b: { text: "Pequeño", emoji: "🐁", lat: "parvus", trait: "Tamaño diminuto" } },
             { q: "¿Cómo es su estructura social?", a: { text: "En Manada", emoji: "🐺", lat: "grex", trait: "Vive en grupos" }, b: { text: "Solitario", emoji: "🐆", lat: "solus", trait: "Es solitario" } },
-            { q: "¿Mecanismo de defensa principal?", a: { text: "Veneno / Toxinas", emoji: "🧪", lat: "tox", trait: "Produce veneno", visual: "toxic bright neon colors" }, b: { text: "Armadura / Cuernos", emoji: "🦏", lat: "cornu", trait: "Posee armadura o cuernos", visual: "heavy bone armor and horns" } },
-            { q: "¿Cómo es su visión?", a: { text: "Ojos grandes", emoji: "👀", lat: "oculus", trait: "Visión aguda", visual: "big expressive eyes" }, b: { text: "Casi ciego", emoji: "🦇", lat: "caecus", trait: "Se guía por otros sentidos", visual: "small blind eyes" } },
+            { q: "¿Mecanismo de defensa principal?", a: { text: "Veneno / Toxinas", emoji: "🧪", lat: "tox", trait: "Produce veneno" }, b: { text: "Armadura / Cuernos", emoji: "🦏", lat: "cornu", trait: "Posee armadura o cuernos" } },
+            { q: "¿Cómo es su visión?", a: { text: "Ojos grandes", emoji: "👀", lat: "oculus", trait: "Visión aguda" }, b: { text: "Casi ciego", emoji: "🦇", lat: "caecus", trait: "Se guía por otros sentidos" } },
             { q: "¿Qué tipo de sonido emite?", a: { text: "Rugido / Grito", emoji: "🦁", lat: "rugiens", trait: "Emite rugidos fuertes" }, b: { text: "Silencioso / Canto", emoji: "🦉", lat: "silens", trait: "Es silencioso o emite cantos" } },
-            { q: "¿Tiene cola visible?", a: { text: "Cola Larga", emoji: "🐒", lat: "longa", trait: "Posee cola prensil o larga", visual: "long magnificent tail" }, b: { text: "Sin cola", emoji: "🐸", lat: "brevis", trait: "Carece de cola", visual: "no tail" } },
-            { q: "¿Cómo son sus extremidades?", a: { text: "Garras afiladas", emoji: "🦅", lat: "acuti", trait: "Garras desarrolladas", visual: "sharp claws" }, b: { text: "Pezuñas o ventosas", emoji: "🦓", lat: "ungula", trait: "Extremidades adaptadas", visual: "cute hooves" } },
-            { q: "¿En qué clima prospera?", a: { text: "Frío extremo", emoji: "❄️", lat: "polaris", trait: "Adaptado al hielo", visual: "snowy icy details" }, b: { text: "Calor / Trópico", emoji: "🌴", lat: "tropicus", trait: "Adaptado al calor", visual: "tropical jungle details" } },
+            { q: "¿Tiene cola visible?", a: { text: "Cola Larga", emoji: "🐒", lat: "longa", trait: "Posee cola prensil o larga" }, b: { text: "Sin cola", emoji: "🐸", lat: "brevis", trait: "Carece de cola" } },
+            { q: "¿Cómo son sus extremidades?", a: { text: "Garras afiladas", emoji: "🦅", lat: "acuti", trait: "Garras desarrolladas" }, b: { text: "Pezuñas o ventosas", emoji: "🦓", lat: "ungula", trait: "Extremidades adaptadas" } },
+            { q: "¿En qué clima prospera?", a: { text: "Frío extremo", emoji: "❄️", lat: "polaris", trait: "Adaptado al hielo" }, b: { text: "Calor / Trópico", emoji: "🌴", lat: "tropicus", trait: "Adaptado al calor" } },
             { q: "¿Dónde descansa o se refugia?", a: { text: "Cuevas / Madrigueras", emoji: "🕳️", lat: "antrum", trait: "Duerme en cavernas" }, b: { text: "Árboles / Nidos", emoji: "🌳", lat: "arbor", trait: "Construye nidos en altura" } },
-            { q: "¿Qué tan rápido es?", a: { text: "Muy rápido", emoji: "⚡", lat: "velox", trait: "Alcanza altas velocidades", visual: "aerodynamic sleek body" }, b: { text: "Lento y cauteloso", emoji: "🐢", lat: "tardus", trait: "Movimientos calculados", visual: "chubby round body" } },
-            { q: "¿Característica especial (Fantasía)?", a: { text: "Bioluminiscente", emoji: "✨", lat: "lux", trait: "Brilla en la oscuridad", visual: "glowing bioluminescent magical aura" }, b: { text: "Camuflaje perfecto", emoji: "🍃", lat: "occultus", trait: "Se vuelve casi invisible", visual: "camouflaged with nature" } }
+            { q: "¿Qué tan rápido es?", a: { text: "Muy rápido", emoji: "⚡", lat: "velox", trait: "Alcanza altas velocidades" }, b: { text: "Lento y cauteloso", emoji: "🐢", lat: "tardus", trait: "Movimientos calculados" } },
+            { q: "¿Característica especial (Fantasía)?", a: { text: "Bioluminiscente", emoji: "✨", lat: "lux", trait: "Brilla en la oscuridad" }, b: { text: "Camuflaje perfecto", emoji: "🍃", lat: "occultus", trait: "Se vuelve casi invisible" } }
         ];
 
         let currentQ = 0;
         let userPath = [];
         let latinParts = [];
-        let visualPrompts = [];
         let finalEmoji = "";
 
         function loadQuestion() {
@@ -321,10 +320,8 @@
 
             const qData = questions[currentQ];
             document.getElementById('question').innerText = `${currentQ + 1}. ${qData.q}`;
-            
             document.getElementById('text-A').innerText = qData.a.text;
             document.getElementById('emoji-A').innerText = qData.a.emoji;
-            
             document.getElementById('text-B').innerText = qData.b.text;
             document.getElementById('emoji-B').innerText = qData.b.emoji;
 
@@ -340,11 +337,6 @@
             userPath.push(`✅ ${selected.trait}`);
             latinParts.push(selected.lat);
             finalEmoji = selected.emoji; 
-            
-            // Recolectar palabras clave para la IA si existen en la respuesta
-            if(selected.visual) {
-                visualPrompts.push(selected.visual);
-            }
 
             currentQ++;
             loadQuestion();
@@ -357,11 +349,12 @@
             // Nombre científico
             let genus = latinParts[0].charAt(0).toUpperCase() + latinParts[0].slice(1) + latinParts[3];
             let species = latinParts[6] + latinParts[18];
+            let scientificName = `${genus} ${species}`;
             
-            document.getElementById('sci-name').innerText = `${genus} ${species}`;
+            document.getElementById('sci-name').innerText = scientificName;
             document.getElementById('final-emoji').innerText = finalEmoji;
 
-            // Ruta
+            // Ruta Taxonómica
             let pathHTML = "<ul>";
             userPath.forEach((step, index) => {
                 pathHTML += `<li><strong>Paso ${index + 1}:</strong> ${step}</li>`;
@@ -369,22 +362,28 @@
             pathHTML += "</ul>";
             document.getElementById('path-list').innerHTML = pathHTML;
 
-            // --- GENERACIÓN DE IMAGEN 3D CON IA ---
-            // Construimos el "prompt" (instrucción) para la IA usando las decisiones del estudiante
-            let basePrompt = "Premium 3D render of a fantasy animal creature, pixar disney style, cute and highly detailed, masterpiece, unreal engine 5, ";
-            let studentDecisions = visualPrompts.join(", ");
-            let finalPrompt = basePrompt + studentDecisions;
-
-            // Usamos la API gratuita de Pollinations para generar la imagen en tiempo real
-            let imageURL = "https://image.pollinations.ai/prompt/" + encodeURIComponent(finalPrompt) + "?width=400&height=400&nologo=true";
+            // --- GENERACIÓN DE IMAGEN CON ROBOHASH ---
+            // Usamos la API de Robohash (Set 2 genera "monstruos/criaturas" muy divertidas).
+            // Le pasamos el nombre científico generado para que cada combinación cree un monstruo único.
+            let imageURL = `https://robohash.org/${encodeURIComponent(scientificName)}?set=set2&size=300x300`;
             
             let imgElement = document.getElementById('species-image');
+            let loaderContainer = document.getElementById('loader-container');
             
-            // Cuando la IA termine de generar la imagen y cargue...
+            // Si carga correctamente:
             imgElement.onload = function() {
-                document.getElementById('loader-container').style.display = 'none'; // Ocultar el texto de carga
-                imgElement.style.display = 'block'; // Mostrar la imagen 3D premium
-                createConfetti(); // Celebrar!
+                loaderContainer.style.display = 'none';
+                imgElement.style.display = 'block';
+                createConfetti(); 
+            };
+
+            // Si por alguna razón falla el internet o el enlace:
+            imgElement.onerror = function() {
+                loaderContainer.style.display = 'none';
+                imgElement.style.display = 'block';
+                // Imagen de respaldo amigable
+                imgElement.src = 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + encodeURIComponent(scientificName);
+                createConfetti();
             };
 
             // Solicitar la imagen
@@ -392,12 +391,12 @@
         }
 
         function createConfetti() {
-            for(let i=0; i<50; i++) {
+            for(let i=0; i<60; i++) {
                 let conf = document.createElement('div');
                 conf.className = 'confetti';
                 conf.style.left = Math.random() * 100 + 'vw';
                 conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                conf.style.backgroundColor = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C'][Math.floor(Math.random()*4)];
+                conf.style.backgroundColor = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C', '#8338ec'][Math.floor(Math.random()*5)];
                 document.body.appendChild(conf);
             }
         }
